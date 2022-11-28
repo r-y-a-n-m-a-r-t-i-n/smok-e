@@ -10,7 +10,8 @@ class Robot:
         self.L_1 = 1  # link 1 length
         self.m_0 = 1  # link 0 mass
         self.m_1 = 1  # link 1 mass
-        self.g = 9.81  # gravity
+        # self.g = 9.81  # gravity
+        self.g = 0.0  # zero-g for debugging
 
         # Initial state [q, q_dot]
         self.x_0 = np.array(
@@ -94,7 +95,7 @@ if __name__ == "__main__":
     while t < t_max:
         # u = [tau_0, tau_1]
 
-        u = np.array([5.0, -5.0])
+        u = np.array([.01, 0])
 
         robot.step(x=robot.x, u=u, dt=dt)
         robot_state_history = np.hstack(
@@ -112,10 +113,13 @@ if __name__ == "__main__":
 
     plt.figure()
     plt.plot(
-        -robot_state_history[0, :] * np.sin(robot_state_history[1, :]),
-        robot_state_history[0, :] * np.cos(robot_state_history[1, :]),
+        x_0,
+        y_0,
     )
-    plt.xlabel("x-position")
-    plt.ylabel("z-position")
-    plt.legend()
+    plt.plot(
+        x_1,
+        y_1,
+    )
+    plt.xlabel("x position")
+    plt.ylabel("y position")
     plt.show()
