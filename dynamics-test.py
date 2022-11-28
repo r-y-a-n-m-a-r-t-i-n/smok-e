@@ -95,7 +95,7 @@ if __name__ == "__main__":
     while t < t_max:
         # u = [tau_0, tau_1]
 
-        u = np.array([.01, 0])
+        u = np.array([0.01, -0.02])
 
         robot.step(x=robot.x, u=u, dt=dt)
         robot_state_history = np.hstack(
