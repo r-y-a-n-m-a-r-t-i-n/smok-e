@@ -95,7 +95,7 @@ if __name__ == "__main__":
     while t < t_max:
         # u = [tau_0, tau_1]
 
-        u = np.array([0.01, -0.02])
+        u = np.array([0.01, 0.0])
 
         robot.step(x=robot.x, u=u, dt=dt)
         robot_state_history = np.hstack(
@@ -108,8 +108,10 @@ if __name__ == "__main__":
 
     x_0 = robot.L_0 * np.cos(robot_state_history[0, :])
     y_0 = robot.L_0 * np.sin(robot_state_history[0, :])
-    x_1 = robot.L_0 * np.cos(robot_state_history[0, :]) + robot.L_1 * np.cos(robot_state_history[0, :] + robot_state_history[1, :])
-    y_1 = robot.L_0 * np.sin(robot_state_history[0, :]) + robot.L_1 * np.sin(robot_state_history[0, :] + robot_state_history[1, :])
+    x_1 = robot.L_0 * np.cos(robot_state_history[0, :]) + robot.L_1 * np.cos(
+        robot_state_history[0, :] + robot_state_history[1, :])
+    y_1 = robot.L_0 * np.sin(robot_state_history[0, :]) + robot.L_1 * np.sin(
+        robot_state_history[0, :] + robot_state_history[1, :])
 
     plt.figure()
     plt.plot(
