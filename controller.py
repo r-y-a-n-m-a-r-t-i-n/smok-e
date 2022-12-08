@@ -1,8 +1,11 @@
+import numpy as np
 import scipy.optimize
+from pydrake.math import RigidTransform
+from pydrake.multibody.parsing import Parser
+from pydrake.multibody.plant import MultibodyPlant
+from pydrake.systems.framework import System
 
 from robot import Robot
-import numpy as np
-import scipy as sp
 
 
 def f(x, robot, r_des):
@@ -33,15 +36,37 @@ def find_arm_trajectory(r_des, q_guess):
     return sol
 
 
-r_des = np.array((1, 1, -1))
 
-q_guess = np.array([
-    -np.pi / 4.0,  # theta_r guess
-    -np.pi / 4.0,  # theta_s guess
-    -np.pi / 4.0,  # theta_e guess
-])
 
-sol = find_arm_trajectory(r_des, q_guess)
 
-print(sol)
+class CalculateTrajectory(System):
+    def __init__(self):
 
+        self.plant = MultibodyPlant(0.0)
+        self.parser = Parser(self.plant)
+        self.parser.AddModelFromFile("planar_walker.urdf")
+        self.plant.WeldFrames(
+            self.plant.world_frame(),
+            self.plant.GetBodyByName("base").body_frame(),
+            RigidTransform.Identity()
+        )
+        self.plant.Finalize()
+        self.plant_context = self.plant.CreateDefaultContext()
+
+        r_des = np.array((1, 1, -1))
+
+        q_guess = np.array([
+            -np.pi / 4.0,  # theta_r guess
+            -np.pi / 4.0,  # theta_s guess
+            -np.pi / 4.0,  # theta_e guess
+        ])
+
+        sol = find_arm_trajectory(r_des, q_guess)
+
+        print(sol)
+
+        return(sol)
+
+
+if __name__ == "__main__":
+    print(sol)

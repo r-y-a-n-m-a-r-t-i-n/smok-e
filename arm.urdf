@@ -1,84 +1,74 @@
-<? xml version="1.0"?>
-<robot name = "arm">
-    <link name ="base">
+<?xml version="1.0"?>
+<robot xmlns:drake="http://drake.mit.edu" name = "arm">
+    <link name ="base_z">
         <visual>
             <geometry>
                 <sphere radius="0.25"/>
+            </geometry>
             <origin>
+            </origin>
             <material>
+                <color rgba="0 0.9 0.9 1.0"/>
+            </material>
         </visual>
-
-        <collision>
+    </link>
+    
+    <link name ="base_x">
+        <visual>
             <geometry>
+                <sphere radius="0.25"/>
+            </geometry>
             <origin>
-        </collision>
-
-        <inertial>
-            <mass>
-            <origin>
-            <inertia>
-        </inertial>
+            </origin>
+            <material>
+                <color rgba="0 0.9 0.9 1.0"/>
+            </material>
+        </visual>
     </link>
 
     <link name ="upper">
         <visual>
             <geometry>
                 <box size="1 1 3"/>
-            <origin>
-            <material>
+            </geometry>
+            <origin xyz="0 0 1.75"/>
+            <material name="Green2">
+               <color rgba="0.1 0.8 0 1.0"/>
+           </material>
         </visual>
-
-        <collision>
-            <geometry>
-            <origin>
-        </collision>
-
-        <inertial>
-            <mass>
-            <origin>
-            <inertia>
-        </inertial>
     </link>
 
-    <joint name = "base" type = "revolute">
+    <joint name = "base" type = "continuous">
         <origin xyz="0 0 0" rpy="0 0 0"/>
-        <parent link="base"/>
-        <child link="upper"/>
+        <parent link="base_z"/>
+        <child link="base_x"/>
         <axis xyz="0 0 1"/>
     </joint>
 
-    <joint name = "shoulder" type = "revolute">
+    <joint name = "shoulder" type = "continuous">
         <origin xyz="0 0 0" rpy="0 0 0"/>
-        <parent link="base"/>
+        <parent link="base_x"/>
         <child link="upper"/>
-        <axis xyz="0 1 0"/>
+        <axis xyz="1 0 0"/>
     </joint>
 
-    <link name = "lower">
+    <link name ="lower">
         <visual>
             <geometry>
                 <box size="1 1 3"/>
-            <origin>
+            </geometry>
+            <origin xyz = "0 0 1.75"/>
             <material>
+                <color rgba="0 0.9 0.9 1.0"/>
+            </material>
         </visual>
-
-        <collision>
-            <geometry>
-            <origin>
-        </collision>
-
-        <inertial>
-            <mass>
-            <origin>
-            <inertia>
-        </inertial>
     </link>
 
-    <joint name = "elbow" type = "revolute">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+    <joint name = "elbow" type = "continuous">
+        <origin xyz="0 0 3" rpy="0 0 0"/>
         <parent link="upper"/>
         <child link="lower"/>
-        <axis xyz="0 1 0"/>
+        <axis xyz="1 0 0"/>
     </joint>
 
 </robot>
