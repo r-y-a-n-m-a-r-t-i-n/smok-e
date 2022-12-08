@@ -11,6 +11,12 @@
                 <color rgba="0 0.9 0.9 1.0"/>
             </material>
         </visual>
+
+   2    <inertial>
+   3      <origin xyz="0 0 0.5" rpy="0 0 0"/>
+   4      <mass value="1"/>
+   5      <inertia ixx="100"  ixy="0"  ixz="0" iyy="100" iyz="0" izz="100" />
+   6    </inertial>
     </link>
     
     <link name ="base_x">
@@ -24,6 +30,12 @@
                 <color rgba="0 0.9 0.9 1.0"/>
             </material>
         </visual>
+
+   2    <inertial>
+   3      <origin xyz="0 0 0"/>
+   4      <mass value="1"/>
+   5      <inertia ixx="100"  ixy="0"  ixz="0" iyy="100" iyz="0" izz="100" />
+   6    </inertial>
     </link>
 
     <link name ="upper">
@@ -36,6 +48,13 @@
                <color rgba="0.1 0.8 0 1.0"/>
            </material>
         </visual>
+
+   2    <inertial>
+   3      <origin xyz="0 0 1.75" rpy="0 0 0"/>
+   4      <mass value="1"/>
+   5      <inertia ixx="100"  ixy="0"  ixz="0" iyy="100" iyz="0" izz="100" />
+   6    </inertial>
+
     </link>
 
     <joint name = "base" type = "continuous">
@@ -62,6 +81,12 @@
                 <color rgba="0 0.9 0.9 1.0"/>
             </material>
         </visual>
+
+   2    <inertial>
+   3      <origin xyz="0 0 1.75"/>
+   4      <mass value="1"/>
+   5      <inertia ixx="100"  ixy="0"  ixz="0" iyy="100" iyz="0" izz="100" />
+   6    </inertial>
     </link>
 
     <joint name = "elbow" type = "continuous">
