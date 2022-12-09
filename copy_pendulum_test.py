@@ -1,16 +1,14 @@
+import numpy as np
 import pydot
 import scipy.optimize
 from IPython.core.display import SVG
 from IPython.core.display_functions import display
-from pydrake.all import Simulator, DiagramBuilder, AddMultibodyPlantSceneGraph, \
-    Parser, RigidTransform, MeshcatVisualizer, MeshcatVisualizerParams, \
-    ConstantVectorSource, ConstantValueSource, PiecewisePolynomial, \
-    AbstractValue, HalfSpace, CoulombFriction, SceneGraph, MultibodyPlant, AutoDiffXd, StartMeshcat
+from pydrake.all import Simulator, DiagramBuilder, Parser, RigidTransform, MeshcatVisualizer, MeshcatVisualizerParams, \
+    ConstantVectorSource, SceneGraph, MultibodyPlant, StartMeshcat
 from pydrake.systems.controllers import PidController
-import numpy as np
-import time
 
 from robot import Robot
+
 
 def f(x, robot, r_des):
     # origin is at arm base (so ground z = -h)
@@ -40,16 +38,12 @@ def find_arm_trajectory(r_des, q_guess):
     return sol
 
 
-
-
 target_realtime_rate = 1.0
 simulation_time = 10
 max_time_step = .0001
-Kp_ = 0.5
-Ki_ = 0.5
-Kd_ = 0.5
-
-
+Kp_ = .5
+Ki_ = .5
+Kd_ = .5
 
 
 def controller(final_state):
@@ -104,9 +98,9 @@ def controller(final_state):
 
     positions = np.zeros((plant.num_positions(), 1))
 
-    positions[0] = 0.0
-    positions[1] = 3.14 / 2.0
-    positions[2] = 0.0
+    positions[0] = np.pi/2
+    positions[1] = np.pi/2
+    positions[2] = np.pi/2
 
     plant.SetPositions(plant_context, positions)
 
@@ -116,19 +110,22 @@ def controller(final_state):
     simulator.AdvanceTo(simulation_time)
 
 
-
 if __name__ == "__main__":
+    # where is the trash
+    r_des = np.array((2, 0, 0))
 
-    r_des = np.array((1, 1, -1)) # where is the trash
-
+    # guess angle positions for solver
     q_guess = np.array([
-        -np.pi / 4.0,  # theta_r guess
-        -np.pi / 4.0,  # theta_s guess
-        -np.pi / 4.0,  # theta_e guess
+        0,  # theta_r guess
+        0,  # theta_s guess
+        0,  # theta_e guess
     ])
 
+    # desired joint positions and velocities
     position_final = find_arm_trajectory(r_des, q_guess)
+    print(position_final)
     velocity_final = np.array((0, 0, 0))
     full_final_state = np.append(position_final, velocity_final)
 
+    # run the simulation/controller
     controller(full_final_state)

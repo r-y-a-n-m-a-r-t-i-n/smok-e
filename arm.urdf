@@ -1,99 +1,114 @@
 <?xml version="1.0"?>
-<robot xmlns:drake="http://drake.mit.edu" name = "arm">
-    <link name ="base_z">
-        <visual>
-            <geometry>
-                <sphere radius="0.25"/>
-            </geometry>
-            <origin>
-            </origin>
-            <material>
-                <color rgba="0 0.9 0.9 1.0"/>
-            </material>
-        </visual>
+<robot
+	xmlns:drake="http://drake.mit.edu" name = "arm">
 
-   2    <inertial>
-   3      <origin xyz="0 0 0.5" rpy="0 0 0"/>
-   4      <mass value="1"/>
-   5      <inertia ixx="100"  ixy="0"  ixz="0" iyy="100" iyz="0" izz="100" />
-   6    </inertial>
-    </link>
-    
-    <link name ="base_x">
-        <visual>
-            <geometry>
-                <sphere radius="0.25"/>
-            </geometry>
-            <origin>
-            </origin>
-            <material>
-                <color rgba="0 0.9 0.9 1.0"/>
-            </material>
-        </visual>
 
-   2    <inertial>
-   3      <origin xyz="0 0 0"/>
-   4      <mass value="1"/>
-   5      <inertia ixx="100"  ixy="0"  ixz="0" iyy="100" iyz="0" izz="100" />
-   6    </inertial>
-    </link>
+	<link name ="base_z">
+		<visual>
+			<geometry>
+				<sphere radius="0.25"/>
+			</geometry>
+			<origin></origin>
+			<material>
+				<color rgba="0 0.9 0.9 1.0"/>
+			</material>
+		</visual>
+		<inertial>
+			<origin xyz="0 0 0.5" rpy="0 0 0"/>
+			<mass value="1"/>
+			<inertia ixx="100"  ixy="0"  ixz="0" iyy="100" iyz="0" izz="100" />
+		</inertial>
+	</link>
 
-    <link name ="upper">
-        <visual>
-            <geometry>
-                <box size="1 1 3"/>
-            </geometry>
-            <origin xyz="0 0 1.75"/>
-            <material name="Green2">
-               <color rgba="0.1 0.8 0 1.0"/>
-           </material>
-        </visual>
 
-   2    <inertial>
-   3      <origin xyz="0 0 1.75" rpy="0 0 0"/>
-   4      <mass value="1"/>
-   5      <inertia ixx="100"  ixy="0"  ixz="0" iyy="100" iyz="0" izz="100" />
-   6    </inertial>
+	<link name ="base_x">
+		<visual>
+			<geometry>
+				<sphere radius="0.25"/>
+			</geometry>
+			<origin></origin>
+			<material>
+				<color rgba="0 0.9 0.9 1.0"/>
+			</material>
+		</visual>
+		<inertial>
+			<origin xyz="0 0 0"/>
+			<mass value="1"/>
+			<inertia ixx="100"  ixy="0"  ixz="0" iyy="100" iyz="0" izz="100" />
+		</inertial>
+	</link>
 
-    </link>
 
-    <joint name = "base" type = "continuous">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <parent link="base_z"/>
-        <child link="base_x"/>
-        <axis xyz="0 0 1"/>
-    </joint>
+	<link name ="upper">
+		<visual>
+			<geometry>
+				<box size=".5 .5 1"/>
+			</geometry>
+			<origin xyz="0 0 .5"/>
+			<material name="Green2">
+				<color rgba="0.1 0.8 0 1.0"/>
+			</material>
+		</visual>
+		<inertial>
+			<origin xyz="0 0 .5" rpy="0 0 0"/>
+			<mass value="1"/>
+			<inertia ixx="100"  ixy="0"  ixz="0" iyy="100" iyz="0" izz="100" />
+		</inertial>
+		<collision>
+			<origin xyz="0 0 .5" rpy="0 0 0"/>
+			<geometry>
+				<box size=".5 .5 1"/>
+			</geometry>
+		</collision>
+	</link>
 
-    <joint name = "shoulder" type = "continuous">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <parent link="base_x"/>
-        <child link="upper"/>
-        <axis xyz="1 0 0"/>
-    </joint>
 
-    <link name ="lower">
-        <visual>
-            <geometry>
-                <box size="1 1 3"/>
-            </geometry>
-            <origin xyz = "0 0 1.75"/>
-            <material>
-                <color rgba="0 0.9 0.9 1.0"/>
-            </material>
-        </visual>
+	<joint name = "base" type = "continuous">
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<parent link="base_z"/>
+		<child link="base_x"/>
+		<axis xyz="0 0 1"/>
+	</joint>
 
-   2    <inertial>
-   3      <origin xyz="0 0 1.75"/>
-   4      <mass value="1"/>
-   5      <inertia ixx="100"  ixy="0"  ixz="0" iyy="100" iyz="0" izz="100" />
-   6    </inertial>
-    </link>
 
-    <joint name = "elbow" type = "continuous">
-        <origin xyz="0 0 3" rpy="0 0 0"/>
-        <parent link="upper"/>
-        <child link="lower"/>
-        <axis xyz="1 0 0"/>
-    </joint>
+	<joint name = "shoulder" type = "revolute">
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<parent link="base_x"/>
+		<child link="upper"/>
+		<axis xyz="1 0 0"/>
+	    <limit lower="0" upper="3.14" effort="1000" velocity="1"/>
+	</joint>
 
+
+	<link name ="lower">
+		<visual>
+			<geometry>
+				<box size=".5 .5 1"/>
+			</geometry>
+			<origin xyz = "0 0 .5"/>
+			<material>
+				<color rgba="0 0.9 0.9 1.0"/>
+			</material>
+		</visual>
+		<inertial>
+			<origin xyz="0 0 .5"/>
+			<mass value="1"/>
+			<inertia ixx="100"  ixy="0"  ixz="0" iyy="100" iyz="0" izz="100" />
+		</inertial>
+		<collision>
+			<origin xyz="0 0 .5"/>
+			<geometry>
+				<box size=".5 .5 1"/>
+			</geometry>
+		</collision>
+	</link>
+
+
+	<joint name = "elbow" type = "revolute">
+		<origin xyz="0 0 1" rpy="0 0 0"/>
+		<parent link="upper"/>
+		<child link="lower"/>
+		<axis xyz="1 0 0"/>
+		<limit lower="0" upper="0.1" effort="1000" velocity="1"/>
+	</joint>
 </robot>

@@ -56,9 +56,9 @@ class CalculateTrajectory(System):
         r_des = np.array((1, 1, -1))
 
         q_guess = np.array([
-            -np.pi / 4.0,  # theta_r guess
-            -np.pi / 4.0,  # theta_s guess
-            -np.pi / 4.0,  # theta_e guess
+            0.0,  # theta_r guess
+            0.0,  # theta_s guess
+            0.0,  # theta_e guess
         ])
 
         sol = find_arm_trajectory(r_des, q_guess)
