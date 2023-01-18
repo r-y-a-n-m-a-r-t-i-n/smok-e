@@ -10,11 +10,11 @@ class Robot:
         self.m_1 = 1  # link 1 mass
         self.m_2 = 1  # link 2 mass
         self.g = 9.81  # gravity
-        self.h = 1    # distance of arm base from ground
+        self.h = .33    # distance of arm base from ground
         # self.g = 0.0  # zero-g for debugging
 
         self.q = np.array(
-            [0.0,  # theta_r (rotate angle)
+            [np.pi/2.0,  # theta_r (rotate angle)
              np.pi / 4.0,  # theta_s (shoulder angle)
              np.pi / 4.0,  # theta_e (elbow angle)
              ]

@@ -38,12 +38,12 @@ def find_arm_trajectory(r_des, q_guess):
     return sol
 
 
-target_realtime_rate = 1.0
-simulation_time = 10
-max_time_step = .0001
-Kp_ = .5
-Ki_ = .5
-Kd_ = .5
+target_realtime_rate = 0.99
+simulation_time = 20
+max_time_step = .00001
+Kp_ = 5
+Ki_ = 5
+Kd_ = 5
 
 
 def controller(final_state):
@@ -66,8 +66,6 @@ def controller(final_state):
 
     plant.Finalize()
 
-    print(plant.num_positions())
-
     Kp = np.ones(plant.num_positions()) * Kp_
     Ki = np.ones(plant.num_positions()) * Ki_
     Kd = np.ones(plant.num_positions()) * Kd_
@@ -82,7 +80,6 @@ def controller(final_state):
         ConstantVectorSource(np.reshape(final_state, (6, 1))))
     builder.Connect(desired_base_source.get_output_port(), pid.get_input_port_desired_state())
 
-    # Handled by pydrake
     builder.Connect(plant.get_geometry_poses_output_port(), scene_graph.get_source_pose_port(plant.get_source_id()))
     builder.Connect(scene_graph.get_query_output_port(), plant.get_geometry_query_input_port())
 
@@ -98,9 +95,13 @@ def controller(final_state):
 
     positions = np.zeros((plant.num_positions(), 1))
 
-    positions[0] = np.pi/2
-    positions[1] = np.pi/2
-    positions[2] = np.pi/2
+    # positions[0] = np.pi/2.0
+    # positions[1] = np.pi/4.0
+    # positions[2] = np.pi/6.0
+
+    positions[0] = 0
+    positions[1] = np.pi / 2.0
+    positions[2] = 0
 
     plant.SetPositions(plant_context, positions)
 
@@ -112,7 +113,7 @@ def controller(final_state):
 
 if __name__ == "__main__":
     # where is the trash
-    r_des = np.array((2, 0, 0))
+    r_des = np.array((1.5, -1.5, -0.5))
 
     # guess angle positions for solver
     q_guess = np.array([
