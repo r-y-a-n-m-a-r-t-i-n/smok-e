@@ -38,12 +38,12 @@ def find_arm_trajectory(r_des, q_guess):
     return sol
 
 
-target_realtime_rate = 0.99
+target_realtime_rate = 1.00
 simulation_time = 20
 max_time_step = .00001
-Kp_ = 5
-Ki_ = 5
-Kd_ = 5
+Kp_ = 1000
+Ki_ = 500
+Kd_ = 500
 
 
 def controller(final_state):
@@ -113,8 +113,7 @@ def controller(final_state):
 
 if __name__ == "__main__":
     # where is the trash
-    r_des = np.array((1.5, -1.5, -0.5))
-
+    r_des = np.array((1, 1, 1))
     # guess angle positions for solver
     q_guess = np.array([
         0,  # theta_r guess
