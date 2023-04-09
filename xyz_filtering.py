@@ -5,6 +5,7 @@ import scipy.optimize
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+
 def f(x, r_des):
     # origin is at arm base (so ground z = -h)
     # y is robot forward, x is robot right, z is up
@@ -47,10 +48,10 @@ def main(currPos: np.ndarray, finPos: np.ndarray):
     # guess angle positions for solver
     q_guesses = np.empty((len(xyz_positions), 3))
     for i in range(len(q_guesses)):
-        # come up with good guess for each?
+        # TODO: come up with decent guess for each
         q_guess = np.array([
             0,  # theta_r guess
-            0,  # theta_s guess
+            np.pi / 2,  # theta_s guess
             0,  # theta_e guess
         ])
         q_guesses[i] = q_guess
