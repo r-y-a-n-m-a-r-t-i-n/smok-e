@@ -42,13 +42,13 @@ def main(currPos: np.ndarray, finPos: np.ndarray):
     r_des = finPos
 
     # TODO: intermediate positions between start and end - arc?
-    # the linspace is just a line so need to fix
+    # the linspace is just a line, change to arc with start and end on circle and servo 1 as center
     xyz_positions = np.linspace(r_curr, r_des)
 
     # guess angle positions for solver
     q_guesses = np.empty((len(xyz_positions), 3))
     for i in range(len(q_guesses)):
-        # TODO: come up with decent guess for each
+        # could try to come up with decent guess for each, but filtering outliers later so may not matter
         q_guess = np.array([
             0,  # theta_r guess
             np.pi / 2,  # theta_s guess
@@ -60,6 +60,28 @@ def main(currPos: np.ndarray, finPos: np.ndarray):
     joint_positions = np.empty((len(xyz_positions), 3))
     for i in range(len(joint_positions)):
         joint_positions[i] = find_arm_trajectory(xyz_positions[i], q_guesses[i])
+
+    mean = np.mean(joint_positions, axis=0)
+    # print("Mean: ", mean)
+    standard_deviation = np.std(joint_positions, axis=0)
+    distance_from_mean = abs(joint_positions - mean)
+    # print("Std Dev: ", standard_deviation)
+    # print("dist from mean: ", distance_from_mean)
+    max_deviations = 2
+    not_outlier = distance_from_mean < max_deviations * standard_deviation
+    not_outlier_indices = np.where(np.all(not_outlier, axis=1))
+    joint_positions_no_outliers = joint_positions[not_outlier_indices]
+
+    # print(joint_positions_no_outliers)
+
+    init = joint_positions[0]
+    fin = joint_positions[-1]
+
+    # print(init)
+    # print(fin)
+
+    joint_positions = np.vstack((init, joint_positions_no_outliers))
+    joint_positions = np.vstack((joint_positions, fin))
     # print(joint_positions)
 
     fig = plt.figure(figsize=(4, 4))
@@ -71,10 +93,10 @@ def main(currPos: np.ndarray, finPos: np.ndarray):
     # convert numpy array to dictionary
     d = dict(enumerate(joint_positions.tolist(), 1))
 
-    print(d)
-
     # convert dictionary to json
-    return json.dumps(d)
+    j = json.dumps(d)
+
+    return j
 
 
 if __name__ == "__main__":
