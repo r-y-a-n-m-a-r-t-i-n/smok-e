@@ -58,7 +58,7 @@ def calcCircle(a, b, c, d, z, r):
     x_den = a ** 2 + b ** 2
     x = x_num / x_den
 
-    y_num = -b ** 2 * c * z + a * np.sqrt(b ** 2 * (r ** 2 * (a ** 2 + b ** 2) - z ** 2(a ** 2 + b ** 2 + c ** 2)))
+    y_num = -b ** 2 * c * z + a * np.sqrt(b ** 2 * (r ** 2 * (a ** 2 + b ** 2) - z ** 2 * (a ** 2 + b ** 2 + c ** 2)))
     y_den = b * (a ** 2 + b ** 2)
     y = y_num / y_den
 
@@ -82,6 +82,7 @@ def main(currPos: np.ndarray, finPos: np.ndarray):
     for i in range(len(xyz_positions)):
         xyz_positions[i] = calcCircle(a, b, c, d, xyz_positions[i][2], r)
 
+    print(xyz_positions)
     # guess angle positions for solver
     q_guesses = np.empty((len(xyz_positions), 3))
     for i in range(len(q_guesses)):
@@ -99,27 +100,18 @@ def main(currPos: np.ndarray, finPos: np.ndarray):
         joint_positions[i] = find_arm_trajectory(xyz_positions[i], q_guesses[i])
 
     mean = np.mean(joint_positions, axis=0)
-    # print("Mean: ", mean)
     standard_deviation = np.std(joint_positions, axis=0)
     distance_from_mean = abs(joint_positions - mean)
-    # print("Std Dev: ", standard_deviation)
-    # print("dist from mean: ", distance_from_mean)
     max_deviations = 2
     not_outlier = distance_from_mean < max_deviations * standard_deviation
     not_outlier_indices = np.where(np.all(not_outlier, axis=1))
     joint_positions_no_outliers = joint_positions[not_outlier_indices]
 
-    # print(joint_positions_no_outliers)
-
     init = joint_positions[0]
     fin = joint_positions[-1]
 
-    # print(init)
-    # print(fin)
-
     joint_positions = np.vstack((init, joint_positions_no_outliers))
     joint_positions = np.vstack((joint_positions, fin))
-    # print(joint_positions)
 
     fig = plt.figure(figsize=(4, 4))
     ax = fig.add_subplot(111, projection='3d')
