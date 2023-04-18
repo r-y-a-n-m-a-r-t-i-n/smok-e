@@ -67,7 +67,7 @@ def calcCircle(a, b, c, d, z, r):
 
 def main(currPos: np.ndarray, finPos: np.ndarray):
     # where am I now
-    r_curr = currPos
+    r_curr = f(currPos, 0)
 
     # where is the trash
     r_des = finPos
