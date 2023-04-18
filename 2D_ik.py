@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 def f(x, r_des):
     # origin is at arm base (so ground z = -h)
     # x is forward, y is up
+    # theta=0 is straight out
     q = x
 
     theta_s = q[0]
@@ -18,8 +19,8 @@ def f(x, r_des):
     # second link length in meters - servo 2 axis to gripper center
     L_2 = 0.563372
 
-    r_x = L_1 * np.sin(theta_s) + L_2 * np.sin(theta_s + theta_e)
-    r_y = L_1 * np.cos(theta_s) + L_2 * np.cos(theta_s + theta_e)
+    r_x = L_1 * np.cos(theta_s) + L_2 * np.cos(theta_s + theta_e)
+    r_y = L_1 * np.sin(theta_s) + L_2 * np.sin(theta_s + theta_e)
 
     return np.array((r_x, r_y)) - r_des
 
@@ -89,17 +90,24 @@ def main(currPos: np.ndarray, finPos: np.ndarray):
 
     # debugging
 
-    # greens = np.linspace(255, 0, num=len(joint_positions)) / 255
-    # reds = np.linspace(0, 255, num=len(joint_positions)) / 255
-    # blues = np.zeros((len(joint_positions),))
-    # alphas = np.ones((len(joint_positions),))
-    # colors = np.column_stack((reds, greens, blues, alphas))
-    #
-    # plt.scatter(joint_positions[:, 0], joint_positions[:, 1], c=colors)
-    # plt.show()
-    #
-    # plt.scatter(xy_positions[:, 0], xy_positions[:, 1], c=colors)
-    # plt.show()
+    greens = np.linspace(255, 0, num=len(joint_positions)) / 255
+    reds = np.linspace(0, 255, num=len(joint_positions)) / 255
+    blues = np.zeros((len(joint_positions),))
+    colors = np.column_stack((reds, greens, blues))
+
+    plt.scatter(np.linspace(1, len(joint_positions[:, 0]), num=len(joint_positions[:, 0])), joint_positions[:, 0], c=colors)
+    plt.scatter(np.linspace(1, len(joint_positions[:, 1]), num=len(joint_positions[:, 1])), joint_positions[:, 1], c=colors)
+    plt.show()
+
+    greens = np.linspace(255, 0, num=len(xy_positions)) / 255
+    reds = np.linspace(0, 255, num=len(xy_positions)) / 255
+    blues = np.zeros((len(xy_positions),))
+    colors = np.column_stack((reds, greens, blues))
+
+    plt.scatter(xy_positions[:, 0], xy_positions[:, 1], c=colors)
+    plt.xlim([-0.653, 1])
+    plt.ylim([-.5, 1])
+    plt.show()
 
     # convert numpy array to dictionary
     d = dict(enumerate(joint_positions.tolist(), 1))
