@@ -54,14 +54,32 @@ def calcPlane(p1, p2, p3):
 def calcCircle(a, b, c, d, z, r):
     # TODO: need to figure out how to select between + and - in QF; probably depends on relative positions of start/goal
     x_num = -a * c * z + np.sqrt(b ** 2 * (r ** 2 * (a ** 2 + b ** 2) - z ** 2 * (a ** 2 + b ** 2 + c ** 2)))
+    x_num_neg = -a * c * z + -np.sqrt(b ** 2 * (r ** 2 * (a ** 2 + b ** 2) - z ** 2 * (a ** 2 + b ** 2 + c ** 2)))
+
     x_den = a ** 2 + b ** 2
     x = x_num / x_den
 
     y_num = -b ** 2 * c * z + a * np.sqrt(b ** 2 * (r ** 2 * (a ** 2 + b ** 2) - z ** 2 * (a ** 2 + b ** 2 + c ** 2)))
+    y_num_neg = -b ** 2 * c * z + a * -np.sqrt(b ** 2 * (r ** 2 * (a ** 2 + b ** 2) - z ** 2 * (a ** 2 + b ** 2 + c ** 2)))
     y_den = b * (a ** 2 + b ** 2)
     y = y_num / y_den
 
+    x, y = projectXY(x, y)
+
     return x, y, z
+
+def projectXY(x, y):
+
+    n = np.array((1, 0, 0))
+    n_norm = np.sqrt(sum(n**2))
+
+    x_orth = (np.dot(x, n) / n_norm ** 2) * n
+    y_orth = (np.dot(y, n) / n_norm ** 2) * n
+
+    x_proj = x - x_orth
+    y_proj = y - y_orth
+
+    return x_proj, y_proj
 
 
 def main(currPos: np.ndarray, finPos: np.ndarray):
@@ -82,6 +100,7 @@ def main(currPos: np.ndarray, finPos: np.ndarray):
         for i in range(len(xyz_positions)):
             xyz_positions[i] = calcCircle(a, b, c, d, xyz_positions[i][2], r)
 
+
     # guess angle positions for solver
     q_guesses = np.empty((len(xyz_positions), 3))
     for i in range(len(q_guesses)):
@@ -98,6 +117,7 @@ def main(currPos: np.ndarray, finPos: np.ndarray):
     for i in range(len(joint_positions)):
         joint_positions[i] = find_arm_trajectory(xyz_positions[i], q_guesses[i])
 
+    # filter outlier positions
     mean = np.mean(joint_positions, axis=0)
     standard_deviation = np.std(joint_positions, axis=0)
     distance_from_mean = abs(joint_positions - mean)
@@ -112,10 +132,37 @@ def main(currPos: np.ndarray, finPos: np.ndarray):
     joint_positions = np.vstack((init, joint_positions_no_outliers))
     joint_positions = np.vstack((joint_positions, fin))
 
-    fig = plt.figure(figsize=(4, 4))
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(joint_positions[:, 0], joint_positions[:, 1], joint_positions[:, 2])
-    # ax.scatter(xyz_positions[:, 0], xyz_positions[:, 1], xyz_positions[:, 2])
+    greens = np.linspace(255, 0, num=len(joint_positions)) / 255
+    reds = np.linspace(0, 255, num=len(joint_positions)) / 255
+    blues = np.zeros((len(joint_positions),))
+    alphas = np.ones((len(joint_positions),))
+    colors = np.column_stack((reds, greens, blues, alphas))
+
+    print(colors)
+
+    fig1 = plt.figure(figsize=(4, 4))
+    ax1 = fig1.add_subplot(111, projection='3d')
+    ax1.scatter(joint_positions[:, 0], joint_positions[:, 1], joint_positions[:, 2], c=colors)
+    ax1.set_xlabel("X")
+    ax1.set_ylabel("Y")
+    ax1.set_zlabel("Z")
+    plt.show()
+
+    greens = np.linspace(255, 0, num=len(xyz_positions)) / 255
+    reds = np.linspace(0, 255, num=len(xyz_positions)) / 255
+    blues = np.zeros((len(xyz_positions),))
+    alphas = np.ones((len(xyz_positions),))
+    colors = np.column_stack((reds, greens, blues, alphas))
+
+    fig2 = plt.figure(figsize=(4, 4))
+    ax2 = fig2.add_subplot(111, projection='3d')
+    ax2.scatter(xyz_positions[:, 0], xyz_positions[:, 1], xyz_positions[:, 2], c=colors)
+    # ax2.scatter(xyz_positions[1:-1, 0], xyz_positions[1:-1, 1], xyz_positions[1:-1, 2])
+    # ax2.scatter(xyz_positions[0, 0], xyz_positions[0, 1], xyz_positions[0, 2], c=colors)
+    # ax2.scatter(xyz_positions[-1, 0], xyz_positions[-1, 1], xyz_positions[-1, 2], c=colors)
+    ax2.set_xlabel("X")
+    ax2.set_ylabel("Y")
+    ax2.set_zlabel("Z")
     plt.show()
 
     # convert numpy array to dictionary
