@@ -17,7 +17,9 @@ def f(x, r_des):
     # first link length in meters - servo 1 axis to servo 2 axis
     L_1 = 0.458978
     # second link length in meters - servo 2 axis to gripper center
+    # old/long
     L_2 = 0.563372
+    # new/short
 
     r_x = L_1 * np.cos(theta_s) + L_2 * np.cos(theta_s + theta_e)
     r_y = L_1 * np.sin(theta_s) + L_2 * np.sin(theta_s + theta_e)
