@@ -3,6 +3,7 @@ import json
 import numpy as np
 import scipy.optimize
 import matplotlib.pyplot as plt
+import math
 
 
 def f(x, r_des):
@@ -11,8 +12,8 @@ def f(x, r_des):
     # theta=0 is straight out
     q = x
 
-    theta_s = q[0]
-    theta_e = q[1]
+    theta_s = q[0] * math.pi / 180
+    theta_e = q[1] * math.pi / 180
 
     # first link length in meters - servo 1 axis to servo 2 axis
     L_1 = 0.458978
@@ -58,7 +59,8 @@ def main(currPos: np.ndarray, finPos: np.ndarray):
     # otherwise travel in linear path
     if np.sign(r_des[0]) != np.sign(r_curr[0]):
         for i in range(len(xy_positions)):
-            xy_positions[i] = calcXcircle(xy_positions[i][1], r, xy_positions[i][0] >= 0)
+            xy_positions[i] = calcXcircle(xy_positions[i][1], r, xy_positions[0][0] >= 0)
+
 
     # guess angle positions for solver
     q_guesses = np.empty((len(xy_positions), 2))
@@ -126,14 +128,11 @@ def main(currPos: np.ndarray, finPos: np.ndarray):
     plt.axvline(0, color='black')
     # plt.show()
 
-    # convert numpy array to dictionary
-    d = dict(enumerate(joint_positions.tolist(), 1))
-
-    # convert dictionary to json
-    j = json.dumps(d)
+    # convert numpy array to json
+    j = json.dumps(joint_positions.tolist())
 
     return j
 
 
 if __name__ == "__main__":
-    main(np.fromstring(sys.argv[1], dtype=float, sep=','), np.fromstring(sys.argv[2], dtype=float, sep=','))
+    print(main(np.fromstring(sys.argv[1], dtype=float, sep=','), np.fromstring(sys.argv[2], dtype=float, sep=',')))
