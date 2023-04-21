@@ -2,6 +2,7 @@ import sys
 import json
 import numpy as np
 import scipy.optimize
+import matplotlib
 import matplotlib.pyplot as plt
 import math
 
@@ -12,8 +13,8 @@ def f(x, r_des):
     # theta=0 is straight out
     q = x
 
-    theta_s = q[0] * math.pi / 180
-    theta_e = q[1] * math.pi / 180
+    theta_s = q[0]
+    theta_e = q[1]
 
     # first link length in meters - servo 1 axis to servo 2 axis
     L_1 = 0.458978
@@ -27,9 +28,10 @@ def f(x, r_des):
 
     return np.array((r_x, r_y)) - r_des
 
+
 def find_arm_trajectory(r_des, q_guess):
     r_guess = f(q_guess, r_des)
-    print(scipy.optimize.fsolve(f, r_guess, args=r_des, full_output=True))
+    # print(scipy.optimize.fsolve(f, r_guess, args=r_des, full_output=True))
     sol = scipy.optimize.fsolve(f, r_guess, args=r_des)
 
     return sol
@@ -46,6 +48,9 @@ def calcXcircle(y, r, inFront):
 
 
 def main(currPos: np.ndarray, finPos: np.ndarray):
+    currPos[0] = currPos[0] * math.pi / 180 - math.pi / 2  # 90 deg is straight forward for shoulder
+    currPos[1] = currPos[1] * math.pi / 180 - math.pi  # 180 deg is straight forward for forearm (in shoulder frame)
+
     # where am I now
     r_curr = f(currPos, 0)
     r = np.linalg.norm(r_curr)
@@ -61,20 +66,19 @@ def main(currPos: np.ndarray, finPos: np.ndarray):
         for i in range(len(xy_positions)):
             xy_positions[i] = calcXcircle(xy_positions[i][1], r, xy_positions[0][0] >= 0)
 
-
     # guess angle positions for solver
     q_guesses = np.empty((len(xy_positions), 2))
     for i in range(len(q_guesses)):
         # could try to come up with decent guess for each, but filtering outliers later so may not matter
         if xy_positions[i][0] < 0:
             q_guess = np.array([
-                0,  # theta_s guess
-                -np.pi / 2  # theta_e guess
+                math.pi / 2,  # theta_s guess in degrees
+                0             # theta_e guess in degrees
             ])
         else:
             q_guess = np.array([
-                0,  # theta_s guess
-                -np.pi / 2,  # theta_e guess
+                math.pi / 2,  # theta_s guess in degrees
+                0             # theta_e guess in degrees
             ])
         q_guesses[i] = q_guess
 
@@ -95,38 +99,63 @@ def main(currPos: np.ndarray, finPos: np.ndarray):
     init = joint_positions[0]
     fin = joint_positions[-1]
 
-    print(fin)
-
     joint_positions = np.vstack((init, joint_positions_no_outliers))
     joint_positions = np.vstack((joint_positions, fin))
 
     # debugging
 
-    greens = np.linspace(255, 0, num=len(joint_positions)) / 255
-    reds = np.linspace(0, 255, num=len(joint_positions)) / 255
-    blues = np.zeros((len(joint_positions),))
-    colors = np.column_stack((reds, greens, blues))
-    plt.scatter(np.linspace(1, len(joint_positions[:, 0]), num=len(joint_positions[:, 0])), joint_positions[:, 0],
-                c=colors)
-
-    greens = np.zeros((len(joint_positions),))
-    blues = np.ones((len(joint_positions),))
-    colors = np.column_stack((reds, greens, blues))
-    plt.scatter(np.linspace(1, len(joint_positions[:, 1]), num=len(joint_positions[:, 1])), joint_positions[:, 1],
-                c=colors)
+    # greens = np.linspace(255, 0, num=len(joint_positions)) / 255
+    # reds = np.linspace(0, 255, num=len(joint_positions)) / 255
+    # blues = np.zeros((len(joint_positions),))
+    # colors = np.column_stack((reds, greens, blues))
+    # plt.scatter(np.linspace(1, len(joint_positions[:, 0]), num=len(joint_positions[:, 0])), joint_positions[:, 0],
+    #             c=colors)
+    #
+    # greens = np.zeros((len(joint_positions),))
+    # blues = np.ones((len(joint_positions),))
+    # colors = np.column_stack((reds, greens, blues))
+    # plt.scatter(np.linspace(1, len(joint_positions[:, 1]), num=len(joint_positions[:, 1])), joint_positions[:, 1],
+    #             c=colors)
+    # plt.show()
+    #
+    # greens = np.linspace(255, 0, num=len(xy_positions)) / 255
+    # reds = np.linspace(0, 255, num=len(xy_positions)) / 255
+    # blues = np.zeros((len(xy_positions),))
+    # colors = np.column_stack((reds, greens, blues))
+    #
+    # plt.scatter(xy_positions[:, 0], xy_positions[:, 1], c=colors)
+    # plt.xlim([-0.653, 1.2])
+    # plt.ylim([-.5, 1.2])
+    # plt.axhline(0, color='black')
+    # plt.axvline(0, color='black')
     # plt.show()
 
-    greens = np.linspace(255, 0, num=len(xy_positions)) / 255
-    reds = np.linspace(0, 255, num=len(xy_positions)) / 255
-    blues = np.zeros((len(xy_positions),))
-    colors = np.column_stack((reds, greens, blues))
+    print(fin)
 
-    plt.scatter(xy_positions[:, 0], xy_positions[:, 1], c=colors)
-    plt.xlim([-0.653, 1.2])
-    plt.ylim([-.5, 1.2])
-    plt.axhline(0, color='black')
-    plt.axvline(0, color='black')
-    # plt.show()
+    L_1 = 0.458978
+    L_2 = 0.563372
+
+    x1 = L_1 * np.cos(fin[0] * np.pi / 180)
+    y1 = L_1 * np.sin(fin[0] * np.pi / 180)
+
+    x2 = L_1 * np.cos(fin[0]) + L_2 * np.cos(fin[0] + fin[1] * np.pi / 180)
+    y2 = L_1 * np.sin(fin[0]) + L_2 * np.sin(fin[0] + fin[1] * np.pi / 180)
+
+    arm1x = np.linspace(0, x1)
+    arm1y = np.linspace(0, y1)
+
+    arm2x = np.linspace(x1, x2)
+    arm2y = np.linspace(y1, y2)
+
+    fig = plt.figure()
+    ax = fig.add_axes((-1, -1, 2, 2))
+    ax.scatter(arm1x, arm1y, color='black')
+    ax.scatter(arm2x, arm2y, color='gray')
+    ax.scatter(r_des[0], r_des[1], color='purple')
+    ax.set_xlim([-1, 1])
+    ax.set_ylim([-1, 1])
+    fig.show()
+
 
     # convert numpy array to json
     j = json.dumps(joint_positions.tolist())
