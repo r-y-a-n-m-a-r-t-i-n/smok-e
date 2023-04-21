@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import math
 
 
-def f(x, r_des):
+def fun(x, r_des):
     # origin is at arm base (so ground z = -h)
     # x is forward, y is up
     # theta=0 is straight out
@@ -31,28 +31,35 @@ def f(x, r_des):
 
 
 def find_arm_trajectory(r_des, q_guess):
-    r_guess = f(q_guess, r_des)
+    r_guess = fun(q_guess, r_des)
     # print(scipy.optimize.fsolve(f, r_guess, args=r_des, full_output=True))
-    sol = scipy.optimize.fsolve(f, r_guess, args=r_des)
+    # sol = scipy.optimize.fsolve(f, r_guess, args=r_des)
+    # if r_des[0] > 0:
+    #     bounds = ((-np.inf, -np.inf), (np.inf, 0))
+    # else:
+    #     bounds = ((-np.inf, 0), (np.inf, np.inf))
 
-    return sol
+    bounds = ((-np.inf, -np.inf), (np.inf, np.inf))
+    bounds = ((-np.inf, -np.inf), (np.inf, 0))
+    print(r_guess)
+
+    sol = scipy.optimize.least_squares(fun, q_guess, args=(r_des,), bounds=bounds)
+    # print(sol["x"])
+    q = sol["x"]
+    return q
 
 
 def main(currPos: np.ndarray, finPos: np.ndarray):
     currPos[0] = currPos[0] * math.pi / 180 - math.pi / 2  # 90 deg is straight forward for shoulder
     currPos[1] = currPos[1] * math.pi / 180 - math.pi  # 180 deg is straight forward for forearm (in shoulder frame)
 
-    # where am I now
-    r_curr = f(currPos, 0)
-    r = np.linalg.norm(r_curr)
-
     # where is the trash
     r_des = finPos
 
     # guess angle positions for solver
     q_guess = np.array([
-        math.pi / 2,  # theta_s guess in degrees
-        0  # theta_e guess in degrees
+        0,            # theta_s guess in degrees
+        -math.pi      # theta_e guess in degrees
     ])
 
     # desired joint positions and velocities
@@ -62,6 +69,8 @@ def main(currPos: np.ndarray, finPos: np.ndarray):
     L_1 = 0.458978
     # L_2 = 0.563372
     L_2 = 0.385572
+
+    q_final = q_final
 
     x1 = L_1 * np.cos(q_final[0])
     y1 = L_1 * np.sin(q_final[0])
