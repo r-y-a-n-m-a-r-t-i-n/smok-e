@@ -20,8 +20,9 @@ def f(x, r_des):
     L_1 = 0.458978
     # second link length in meters - servo 2 axis to gripper center
     # old/long
-    L_2 = 0.563372
+    # L_2 = 0.563372
     # new/short
+    L_2 = 0.385572
 
     r_x = L_1 * np.cos(theta_s) + L_2 * np.cos(theta_s + theta_e)
     r_y = L_1 * np.sin(theta_s) + L_2 * np.sin(theta_s + theta_e)
@@ -59,13 +60,14 @@ def main(currPos: np.ndarray, finPos: np.ndarray):
 
     # debugging plots
     L_1 = 0.458978
-    L_2 = 0.563372
+    # L_2 = 0.563372
+    L_2 = 0.385572
 
-    x1 = L_1 * np.cos(q_final[0] * np.pi / 180)
-    y1 = L_1 * np.sin(q_final[0] * np.pi / 180)
+    x1 = L_1 * np.cos(q_final[0])
+    y1 = L_1 * np.sin(q_final[0])
 
-    x2 = L_1 * np.cos(q_final[0]) + L_2 * np.cos(q_final[0] + q_final[1] * np.pi / 180)
-    y2 = L_1 * np.sin(q_final[0]) + L_2 * np.sin(q_final[0] + q_final[1] * np.pi / 180)
+    x2 = L_1 * np.cos(q_final[0]) + L_2 * np.cos(q_final[0] + q_final[1])
+    y2 = L_1 * np.sin(q_final[0]) + L_2 * np.sin(q_final[0] + q_final[1])
 
     arm1x = np.linspace(0, x1)
     arm1y = np.linspace(0, y1)
@@ -73,14 +75,12 @@ def main(currPos: np.ndarray, finPos: np.ndarray):
     arm2x = np.linspace(x1, x2)
     arm2y = np.linspace(y1, y2)
 
-    fig = plt.figure()
-    ax = fig.add_axes((-1, -1, 2, 2))
-    ax.scatter(arm1x, arm1y, color='black')
-    ax.scatter(arm2x, arm2y, color='gray')
-    ax.scatter(r_des[0], r_des[1], color='purple')
-    ax.set_xlim([-1, 1])
-    ax.set_ylim([-1, 1])
-    fig.show()
+    plt.scatter(arm1x, arm1y, color='black')
+    plt.scatter(arm2x, arm2y, color='gray')
+    plt.scatter(r_des[0], r_des[1], color='purple')
+    plt.xlim([-1, 1])
+    plt.ylim([-1, 1])
+    plt.show()
 
     # change to degrees and correct frame/orientation
     q_final[0] = (q_final[0] + math.pi / 2) * 180 / math.pi
