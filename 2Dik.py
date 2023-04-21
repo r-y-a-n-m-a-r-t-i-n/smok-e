@@ -34,13 +34,11 @@ def find_arm_trajectory(r_des, q_guess):
     r_guess = fun(q_guess, r_des)
     # print(scipy.optimize.fsolve(f, r_guess, args=r_des, full_output=True))
     # sol = scipy.optimize.fsolve(f, r_guess, args=r_des)
-    # if r_des[0] > 0:
-    #     bounds = ((-np.inf, -np.inf), (np.inf, 0))
-    # else:
-    #     bounds = ((-np.inf, 0), (np.inf, np.inf))
+    if r_des[0] > 0:
+        bounds = ((-np.inf, -np.inf), (np.inf, 0))
+    else:
+        bounds = ((-np.inf, 0), (np.inf, np.inf))
 
-    bounds = ((-np.inf, -np.inf), (np.inf, np.inf))
-    bounds = ((-np.inf, -np.inf), (np.inf, 0))
     print(r_guess)
 
     sol = scipy.optimize.least_squares(fun, q_guess, args=(r_des,), bounds=bounds)
