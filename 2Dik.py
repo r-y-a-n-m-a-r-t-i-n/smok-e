@@ -39,7 +39,7 @@ def find_arm_trajectory(r_des, q_guess):
     else:
         bounds = ((-np.inf, 0), (np.inf, np.inf))
 
-    print(r_guess)
+    # print(r_guess)
 
     sol = scipy.optimize.least_squares(fun, q_guess, args=(r_des,), bounds=bounds)
     # print(sol["x"])
